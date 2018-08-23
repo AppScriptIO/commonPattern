@@ -1,0 +1,5 @@
+{
+    "name": "createInstance.staticMethod",
+    "version": "0.1.0",
+    "main": "entrypoint.js"
+}
