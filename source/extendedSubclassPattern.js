@@ -38,6 +38,11 @@ function Superclass() {
             return Reflect.construct(Class.extendedSubclass.static[name], args)
         }
 
+        // return the subclass object related to this class object.
+        Class.getSubclass = function({ subclassName }) {
+            return Class.extendedSubclass.static[subclassName]
+        }
+        
         return Class
     }
 }

@@ -2,9 +2,9 @@ import { MultiplePrototypeChain } from '@dependency/multiplePrototypeChain'
 
 /**
  * Superclass Instance Context Pattern allows creation of a context in a superclass controller, 
- * where subclasses instances can be grouped together sharing different contexts for each group.
+ * where subclasses instances can be grouped together sharing different contexts for each group. 
+ * Uses `MultiplePrototypeChain` to re-wire the prototype chain of the object instance, where it will be able to create instances using the original static class prototype funcitons.
  */
-
 export function superclassInstanceContextPattern() {
     return Class => {
         Class.createContext = function(argsObject) {
@@ -13,11 +13,12 @@ export function superclassInstanceContextPattern() {
             
             // loop over arguments and add properties
             // contextInstance.portAppInstance // calling instance that contains the context
+            contextInstance.sharedContext = {}
             if(argsObject) Object.entries(argsObject).forEach(([key, value]) => {
-                contextInstance[key] = value
+                contextInstance.sharedContext[key] = value
             })
             // Add cache list
-            contextInstance.instance = { nestedUnit: [], unit: [] } // caching arrays
+            contextInstance.instance = { node: [], dataItem: [] } // caching arrays
             
             // create a new list object for proxied refrence of subclasses
             contextInstance.instanceExtendedSubclass = Object.keys(self.extendedSubclass.static)
@@ -33,6 +34,13 @@ export function superclassInstanceContextPattern() {
             return contextInstance
         }
 
+        // return the subclass object related to this class object.
+        Class.prototype.getSubclass = function({ subclassName }) {
+            let contextInstance = this
+            return contextInstance.instanceExtendedSubclass[subclassName]
+        }
+
+        // execute new on the subclass 
         Class.prototype.callSubclass = function(name, args) {
             let contextInstance = this
             return Reflect.construct(contextInstance.instanceExtendedSubclass[name], args)
