@@ -18,10 +18,11 @@ export function add({ to = 'static' }, method) {
 }
 
 export function execute({ staticMethod, self = true, args = [] }) {
-    return Class => {
-        if(self) args.unshift(Class) // add to beginning 
-        Class[staticMethod](...args)
-        return Class
+    // return a decorator function
+    return targetClass => {
+        if(self) args.unshift(targetClass) // add to beginning 
+        targetClass[staticMethod](...args)
+        return targetClass
     }
 }
 
