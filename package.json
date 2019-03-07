@@ -4,5 +4,9 @@
   "version": "1.0.0",
   "dependencies": {
     "promise-events": "^0.1.4"
+  },
+  "devDependencies": {
+    "eslint": "^5.15.1",
+    "babel-eslint": "^10.0.1"
   }
 }
