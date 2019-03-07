@@ -6,7 +6,6 @@ import { MultiplePrototypeChain } from '@dependency/multiplePrototypeChain'
  * Uses `MultiplePrototypeChain` to re-wire the prototype chain of the object instance, where it will be able to create instances using the original static class prototype funcitons.
  */
 export function createContextClass({ Superclass }) {
-
     // NOTE: This is the same thing as using a client interface to wrap instance creation, the difference is that in case of using this implementation
     // the client interface has many responsibilities, among them are: 
     // - creation of context instance and its responsibilities like caching.

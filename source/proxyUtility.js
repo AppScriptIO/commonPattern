@@ -29,7 +29,8 @@ export function createProxyHandlerReflectedToTargetObject({
 }
 
 /*
- * Ensures that constructor proxy traps comply with spec. Where it adds required values for constructor proxy targets as specified in spec. Fixes issue of creating non costructor object traps for a constructor proxy target.
+ * Ensures that constructor proxy traps comply with JS specification https://tc39.github.io/ecma262/#sec-proxy-object-internal-methods-and-internal-slots-ownpropertykeys.
+ * Where it adds required values for constructor proxy targets as specified in spec. Fixes issue of creating non costructor object traps for a constructor proxy target.
  * IMPORTANT: Creating a proxy of a function with traps targeting objects must return 'arguments' as property when 'ownKeys' trap is called as is degined in the spec https://stackoverflow.com/questions/39811021/typeerror-ownkeys-on-proxy-trap-result-did-not-include-arguments/42876020
  * While using arrow functions for bypassing the requirement for 'arguments' to be present, it will fail in instantiation of new instance (arrow functions do not have 'this', and thus cannot be used as constructors) 
  */
