@@ -1,9 +1,6 @@
-Contains modules that require separation.
-
-## Design Patterns
-- prototypal inheritance proxies & multiple inheritance
-https://itnext.io/multiple-inheritance-in-js-d39244c791a9
-
+ _Modules inside this repository require refactoring/separation._
+ 
+ Contains modules implementing specific design patterns.
 ___
 
 ### 🔑 License: [MIT](/.github/LICENSE)
