@@ -8,5 +8,5 @@
   "devDependencies": {
     "@dependency/javascriptStaticAnalysis": "https://github.com/AppScriptIO/javascriptStaticAnalysis",
     "typescript": "^3.3.3333"
-  } 
+  }
 }
