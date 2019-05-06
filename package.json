@@ -1,12 +1,13 @@
 {
   "name": "@dependency/commonPattern",
-  "main": "./source/entrypoint.js",
+  "main": "./entrypoint/programmaticAPI",
   "version": "1.0.0",
   "dependencies": {
     "promise-events": "^0.1.4"
   },
   "devDependencies": {
-    "@dependency/javascriptStaticAnalysis": "https://github.com/AppScriptIO/javascriptStaticAnalysis",
+    "@dependency/javascriptTranspilation": "https://github.com/AppScriptIO/javascriptTranspilation#semver:^1.x.x",
+    "@dependency/javascriptStaticAnalysis": "https://github.com/AppScriptIO/javascriptStaticAnalysis#semver:^1.x.x",
     "typescript": "^3.3.3333"
   }
 }
