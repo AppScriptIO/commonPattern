@@ -1,22 +1,22 @@
+"use strict";Object.defineProperty(exports, "__esModule", { value: true });exports.default = _default;exports.updated = void 0;
 
-/**
- * @description Get subclasses constructors and add them to Class static property array (self.extendedSubclass.static[]).
- * @requires {array} this.extendedSubclass.static
- * @action adds an array element to "extendedSubclass.static" array.
- * @param  {class{}} staticSubclass
- * @usedAs class module.
- */
- export default function (staticSubclass) {
-    const self = this
-    if(!staticSubclass) return;
-    Object.entries(staticSubclass).forEach(([key, value]) => {
-        self.extendedSubclass.static[key] = value
-    });
+
+
+
+
+
+
+function _default(staticSubclass) {
+  const self = this;
+  if (!staticSubclass) return;
+  Object.entries(staticSubclass).forEach(([key, value]) => {
+    self.extendedSubclass.static[key] = value;
+  });
 }
 
-export let updated = function ({ keyName = null, subclass }) {
-    const self = this
-    if(!keyName) return;
-    self.extendedSubclass.static[keyName] = subclass
-}
-
+let updated = function ({ keyName = null, subclass }) {
+  const self = this;
+  if (!keyName) return;
+  self.extendedSubclass.static[keyName] = subclass;
+};exports.updated = updated;
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uLy4uLy4uL3NvdXJjZS9hZGRTdGF0aWNTdWJjbGFzc1RvQ2xhc3NBcnJheS5zdGF0aWNNZXRob2QvZW50cnlwb2ludC5qcyJdLCJuYW1lcyI6WyJzdGF0aWNTdWJjbGFzcyIsInNlbGYiLCJPYmplY3QiLCJlbnRyaWVzIiwiZm9yRWFjaCIsImtleSIsInZhbHVlIiwiZXh0ZW5kZWRTdWJjbGFzcyIsInN0YXRpYyIsInVwZGF0ZWQiLCJrZXlOYW1lIiwic3ViY2xhc3MiXSwibWFwcGluZ3MiOiI7Ozs7Ozs7O0FBUWdCLGtCQUFVQSxjQUFWLEVBQTBCO0FBQ3RDLFFBQU1DLElBQUksR0FBRyxJQUFiO0FBQ0EsTUFBRyxDQUFDRCxjQUFKLEVBQW9CO0FBQ3BCRSxFQUFBQSxNQUFNLENBQUNDLE9BQVAsQ0FBZUgsY0FBZixFQUErQkksT0FBL0IsQ0FBdUMsQ0FBQyxDQUFDQyxHQUFELEVBQU1DLEtBQU4sQ0FBRCxLQUFrQjtBQUNyREwsSUFBQUEsSUFBSSxDQUFDTSxnQkFBTCxDQUFzQkMsTUFBdEIsQ0FBNkJILEdBQTdCLElBQW9DQyxLQUFwQztBQUNILEdBRkQ7QUFHSDs7QUFFTSxJQUFJRyxPQUFPLEdBQUcsVUFBVSxFQUFFQyxPQUFPLEdBQUcsSUFBWixFQUFrQkMsUUFBbEIsRUFBVixFQUF3QztBQUN6RCxRQUFNVixJQUFJLEdBQUcsSUFBYjtBQUNBLE1BQUcsQ0FBQ1MsT0FBSixFQUFhO0FBQ2JULEVBQUFBLElBQUksQ0FBQ00sZ0JBQUwsQ0FBc0JDLE1BQXRCLENBQTZCRSxPQUE3QixJQUF3Q0MsUUFBeEM7QUFDSCxDQUpNLEMiLCJzb3VyY2VzQ29udGVudCI6WyJcclxuLyoqXHJcbiAqIEBkZXNjcmlwdGlvbiBHZXQgc3ViY2xhc3NlcyBjb25zdHJ1Y3RvcnMgYW5kIGFkZCB0aGVtIHRvIENsYXNzIHN0YXRpYyBwcm9wZXJ0eSBhcnJheSAoc2VsZi5leHRlbmRlZFN1YmNsYXNzLnN0YXRpY1tdKS5cclxuICogQHJlcXVpcmVzIHthcnJheX0gdGhpcy5leHRlbmRlZFN1YmNsYXNzLnN0YXRpY1xyXG4gKiBAYWN0aW9uIGFkZHMgYW4gYXJyYXkgZWxlbWVudCB0byBcImV4dGVuZGVkU3ViY2xhc3Muc3RhdGljXCIgYXJyYXkuXHJcbiAqIEBwYXJhbSAge2NsYXNze319IHN0YXRpY1N1YmNsYXNzXHJcbiAqIEB1c2VkQXMgY2xhc3MgbW9kdWxlLlxyXG4gKi9cclxuIGV4cG9ydCBkZWZhdWx0IGZ1bmN0aW9uIChzdGF0aWNTdWJjbGFzcykge1xyXG4gICAgY29uc3Qgc2VsZiA9IHRoaXNcclxuICAgIGlmKCFzdGF0aWNTdWJjbGFzcykgcmV0dXJuO1xyXG4gICAgT2JqZWN0LmVudHJpZXMoc3RhdGljU3ViY2xhc3MpLmZvckVhY2goKFtrZXksIHZhbHVlXSkgPT4ge1xyXG4gICAgICAgIHNlbGYuZXh0ZW5kZWRTdWJjbGFzcy5zdGF0aWNba2V5XSA9IHZhbHVlXHJcbiAgICB9KTtcclxufVxyXG5cclxuZXhwb3J0IGxldCB1cGRhdGVkID0gZnVuY3Rpb24gKHsga2V5TmFtZSA9IG51bGwsIHN1YmNsYXNzIH0pIHtcclxuICAgIGNvbnN0IHNlbGYgPSB0aGlzXHJcbiAgICBpZigha2V5TmFtZSkgcmV0dXJuO1xyXG4gICAgc2VsZi5leHRlbmRlZFN1YmNsYXNzLnN0YXRpY1trZXlOYW1lXSA9IHN1YmNsYXNzXHJcbn1cclxuXHJcbiJdfQ==

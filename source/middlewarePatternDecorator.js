@@ -1,11 +1,12 @@
-/*** Function wrapped middleware pattern - the middleware is wrapped with a function and accepts option arguments */
-export function functionWrappedMiddlewareDecorator(func) {
-    return new Proxy(func, {
-        apply: (target, thisArg, argumentsList) => {
-            let middleware = async (context, next) => {
-                await target.apply(thisArg, [context, next, ...argumentsList])
-            }
-            return middleware // returns a middleware after creating a context for argumentsList
-        }
-    })
+"use strict";Object.defineProperty(exports, "__esModule", { value: true });exports.functionWrappedMiddlewareDecorator = functionWrappedMiddlewareDecorator;
+function functionWrappedMiddlewareDecorator(func) {
+  return new Proxy(func, {
+    apply: (target, thisArg, argumentsList) => {
+      let middleware = async (context, next) => {
+        await target.apply(thisArg, [context, next, ...argumentsList]);
+      };
+      return middleware;
+    } });
+
 }
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uLy4uL3NvdXJjZS9taWRkbGV3YXJlUGF0dGVybkRlY29yYXRvci5qcyJdLCJuYW1lcyI6WyJmdW5jdGlvbldyYXBwZWRNaWRkbGV3YXJlRGVjb3JhdG9yIiwiZnVuYyIsIlByb3h5IiwiYXBwbHkiLCJ0YXJnZXQiLCJ0aGlzQXJnIiwiYXJndW1lbnRzTGlzdCIsIm1pZGRsZXdhcmUiLCJjb250ZXh0IiwibmV4dCJdLCJtYXBwaW5ncyI6IjtBQUNPLFNBQVNBLGtDQUFULENBQTRDQyxJQUE1QyxFQUFrRDtBQUNyRCxTQUFPLElBQUlDLEtBQUosQ0FBVUQsSUFBVixFQUFnQjtBQUNuQkUsSUFBQUEsS0FBSyxFQUFFLENBQUNDLE1BQUQsRUFBU0MsT0FBVCxFQUFrQkMsYUFBbEIsS0FBb0M7QUFDdkMsVUFBSUMsVUFBVSxHQUFHLE9BQU9DLE9BQVAsRUFBZ0JDLElBQWhCLEtBQXlCO0FBQ3RDLGNBQU1MLE1BQU0sQ0FBQ0QsS0FBUCxDQUFhRSxPQUFiLEVBQXNCLENBQUNHLE9BQUQsRUFBVUMsSUFBVixFQUFnQixHQUFHSCxhQUFuQixDQUF0QixDQUFOO0FBQ0gsT0FGRDtBQUdBLGFBQU9DLFVBQVA7QUFDSCxLQU5rQixFQUFoQixDQUFQOztBQVFIIiwic291cmNlc0NvbnRlbnQiOlsiLyoqKiBGdW5jdGlvbiB3cmFwcGVkIG1pZGRsZXdhcmUgcGF0dGVybiAtIHRoZSBtaWRkbGV3YXJlIGlzIHdyYXBwZWQgd2l0aCBhIGZ1bmN0aW9uIGFuZCBhY2NlcHRzIG9wdGlvbiBhcmd1bWVudHMgKi9cclxuZXhwb3J0IGZ1bmN0aW9uIGZ1bmN0aW9uV3JhcHBlZE1pZGRsZXdhcmVEZWNvcmF0b3IoZnVuYykge1xyXG4gICAgcmV0dXJuIG5ldyBQcm94eShmdW5jLCB7XHJcbiAgICAgICAgYXBwbHk6ICh0YXJnZXQsIHRoaXNBcmcsIGFyZ3VtZW50c0xpc3QpID0+IHtcclxuICAgICAgICAgICAgbGV0IG1pZGRsZXdhcmUgPSBhc3luYyAoY29udGV4dCwgbmV4dCkgPT4ge1xyXG4gICAgICAgICAgICAgICAgYXdhaXQgdGFyZ2V0LmFwcGx5KHRoaXNBcmcsIFtjb250ZXh0LCBuZXh0LCAuLi5hcmd1bWVudHNMaXN0XSlcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgICAgICByZXR1cm4gbWlkZGxld2FyZSAvLyByZXR1cm5zIGEgbWlkZGxld2FyZSBhZnRlciBjcmVhdGluZyBhIGNvbnRleHQgZm9yIGFyZ3VtZW50c0xpc3RcclxuICAgICAgICB9XHJcbiAgICB9KVxyXG59Il19

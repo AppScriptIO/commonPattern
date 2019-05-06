@@ -1,76 +1,77 @@
-export function add({ to = 'static' }, method) {
-    return Class => {
-        let targetReference;
-        switch (to) {
-            case 'prototype':
-                targetReference = Class.prototype
-            break;
-            case 'static':
-            default:
-                targetReference = Class
-            break;
+"use strict";Object.defineProperty(exports, "__esModule", { value: true });exports.add = add;exports.execute = execute;exports.conditional = conditional;exports.executeOnceForEachInstance = executeOnceForEachInstance;exports.executionLevel = executionLevel;function add({ to = 'static' }, method) {
+  return Class => {
+    let targetReference;
+    switch (to) {
+      case 'prototype':
+        targetReference = Class.prototype;
+        break;
+      case 'static':
+      default:
+        targetReference = Class;
+        break;}
+
+    Object.entries(method).forEach(
+    ([key, value]) => targetReference[key] = value);
+
+    return Class;
+  };
+}
+
+function execute({ staticMethod, self = true, args = [] }) {
+
+  return targetClass => {
+    if (self) args.unshift(targetClass);
+    targetClass[staticMethod](...args);
+    return targetClass;
+  };
+}
+
+
+function conditional({ condition = true, decorator }) {
+  return condition ? decorator : Class => {return Class;};
+}
+
+
+
+
+
+function executeOnceForEachInstance() {
+  return (target, methodName, descriptor) => {
+    let method = target[methodName];
+    descriptor.value = new Proxy(method, {
+      apply: async (target, thisArg, argumentsList) => {
+        if (thisArg.executedmethod &&
+        thisArg.executedmethod[methodName] &&
+        thisArg.executedmethod[methodName]['executed'])
+        {
+          return thisArg.executedmethod[methodName]['result'];
         }
-        Object.entries(method).forEach(
-            ([key, value]) => targetReference[key] = value
-        )
-        return Class
-    }
+        thisArg.executedmethod = {};
+        thisArg.executedmethod[methodName] = {};
+        let instance = await target.apply(thisArg, argumentsList);
+        thisArg.executedmethod[methodName]['executed'] = true;
+        thisArg.executedmethod[methodName]['result'] = instance;
+        return instance;
+      } });
+
+    return descriptor;
+  };
 }
 
-export function execute({ staticMethod, self = true, args = [] }) {
-    // return a decorator function
-    return targetClass => {
-        if(self) args.unshift(targetClass) // add to beginning 
-        targetClass[staticMethod](...args)
-        return targetClass
-    }
-}
 
-// Apply decorator only if condition is true
-export function conditional({ condition = true, decorator }) {
-    return (condition) ? decorator : Class => { return Class } ; 
-}
 
-/** 
- * method decorator to execute method only once on instance. caching the result of the first execution to return it on subsequent calls.
- * Tracks execution using 'executedmethod' object, which it adds to this argument.
-*/
-export function executeOnceForEachInstance() { // decorator + proxy
-    return (target, methodName, descriptor) => {
-        let method = target[methodName]
-        descriptor.value = new Proxy(method, {
-            apply: async (target, thisArg, argumentsList) => {
-                if( thisArg.executedmethod && 
-                    thisArg.executedmethod[methodName] &&
-                    thisArg.executedmethod[methodName]['executed']
-                ) {
-                    return thisArg.executedmethod[methodName]['result']
-                }
-                thisArg.executedmethod = {}
-                thisArg.executedmethod[methodName] = {}
-                let instance = await target.apply(thisArg, argumentsList)
-                thisArg.executedmethod[methodName]['executed'] = true
-                thisArg.executedmethod[methodName]['result'] = instance
-                return instance
-            }
-        })
-        return descriptor
-    }
-}
 
-/** 
- * method decorator to check if nestedUnit is parent or child, i.e. top level or nested levels.
- * Adds "executionLevel" property to this argument.
-*/
-export function executionLevel() { // decorator + proxy
-    return (target, methodName, descriptor) => {
-        let method = target[methodName]
-        descriptor.value = new Proxy(method, {
-            apply: async (target, thisArg, argumentsList) => {
-                thisArg.executionLevel = (thisArg.key) ? 'nested' : 'topLevel'
-                return await target.apply(thisArg, argumentsList)
-            }
-        })
-        return descriptor
-    }
+
+function executionLevel() {
+  return (target, methodName, descriptor) => {
+    let method = target[methodName];
+    descriptor.value = new Proxy(method, {
+      apply: async (target, thisArg, argumentsList) => {
+        thisArg.executionLevel = thisArg.key ? 'nested' : 'topLevel';
+        return await target.apply(thisArg, argumentsList);
+      } });
+
+    return descriptor;
+  };
 }
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uLy4uL3NvdXJjZS9kZWNvcmF0b3JVdGlsaXR5LmpzIl0sIm5hbWVzIjpbImFkZCIsInRvIiwibWV0aG9kIiwiQ2xhc3MiLCJ0YXJnZXRSZWZlcmVuY2UiLCJwcm90b3R5cGUiLCJPYmplY3QiLCJlbnRyaWVzIiwiZm9yRWFjaCIsImtleSIsInZhbHVlIiwiZXhlY3V0ZSIsInN0YXRpY01ldGhvZCIsInNlbGYiLCJhcmdzIiwidGFyZ2V0Q2xhc3MiLCJ1bnNoaWZ0IiwiY29uZGl0aW9uYWwiLCJjb25kaXRpb24iLCJkZWNvcmF0b3IiLCJleGVjdXRlT25jZUZvckVhY2hJbnN0YW5jZSIsInRhcmdldCIsIm1ldGhvZE5hbWUiLCJkZXNjcmlwdG9yIiwiUHJveHkiLCJhcHBseSIsInRoaXNBcmciLCJhcmd1bWVudHNMaXN0IiwiZXhlY3V0ZWRtZXRob2QiLCJpbnN0YW5jZSIsImV4ZWN1dGlvbkxldmVsIl0sIm1hcHBpbmdzIjoiaVFBQU8sU0FBU0EsR0FBVCxDQUFhLEVBQUVDLEVBQUUsR0FBRyxRQUFQLEVBQWIsRUFBZ0NDLE1BQWhDLEVBQXdDO0FBQzNDLFNBQU9DLEtBQUssSUFBSTtBQUNaLFFBQUlDLGVBQUo7QUFDQSxZQUFRSCxFQUFSO0FBQ0ksV0FBSyxXQUFMO0FBQ0lHLFFBQUFBLGVBQWUsR0FBR0QsS0FBSyxDQUFDRSxTQUF4QjtBQUNKO0FBQ0EsV0FBSyxRQUFMO0FBQ0E7QUFDSUQsUUFBQUEsZUFBZSxHQUFHRCxLQUFsQjtBQUNKLGNBUEo7O0FBU0FHLElBQUFBLE1BQU0sQ0FBQ0MsT0FBUCxDQUFlTCxNQUFmLEVBQXVCTSxPQUF2QjtBQUNJLEtBQUMsQ0FBQ0MsR0FBRCxFQUFNQyxLQUFOLENBQUQsS0FBa0JOLGVBQWUsQ0FBQ0ssR0FBRCxDQUFmLEdBQXVCQyxLQUQ3Qzs7QUFHQSxXQUFPUCxLQUFQO0FBQ0gsR0FmRDtBQWdCSDs7QUFFTSxTQUFTUSxPQUFULENBQWlCLEVBQUVDLFlBQUYsRUFBZ0JDLElBQUksR0FBRyxJQUF2QixFQUE2QkMsSUFBSSxHQUFHLEVBQXBDLEVBQWpCLEVBQTJEOztBQUU5RCxTQUFPQyxXQUFXLElBQUk7QUFDbEIsUUFBR0YsSUFBSCxFQUFTQyxJQUFJLENBQUNFLE9BQUwsQ0FBYUQsV0FBYjtBQUNUQSxJQUFBQSxXQUFXLENBQUNILFlBQUQsQ0FBWCxDQUEwQixHQUFHRSxJQUE3QjtBQUNBLFdBQU9DLFdBQVA7QUFDSCxHQUpEO0FBS0g7OztBQUdNLFNBQVNFLFdBQVQsQ0FBcUIsRUFBRUMsU0FBUyxHQUFHLElBQWQsRUFBb0JDLFNBQXBCLEVBQXJCLEVBQXNEO0FBQ3pELFNBQVFELFNBQUQsR0FBY0MsU0FBZCxHQUEwQmhCLEtBQUssSUFBSSxDQUFFLE9BQU9BLEtBQVAsQ0FBYyxDQUExRDtBQUNIOzs7Ozs7QUFNTSxTQUFTaUIsMEJBQVQsR0FBc0M7QUFDekMsU0FBTyxDQUFDQyxNQUFELEVBQVNDLFVBQVQsRUFBcUJDLFVBQXJCLEtBQW9DO0FBQ3ZDLFFBQUlyQixNQUFNLEdBQUdtQixNQUFNLENBQUNDLFVBQUQsQ0FBbkI7QUFDQUMsSUFBQUEsVUFBVSxDQUFDYixLQUFYLEdBQW1CLElBQUljLEtBQUosQ0FBVXRCLE1BQVYsRUFBa0I7QUFDakN1QixNQUFBQSxLQUFLLEVBQUUsT0FBT0osTUFBUCxFQUFlSyxPQUFmLEVBQXdCQyxhQUF4QixLQUEwQztBQUM3QyxZQUFJRCxPQUFPLENBQUNFLGNBQVI7QUFDQUYsUUFBQUEsT0FBTyxDQUFDRSxjQUFSLENBQXVCTixVQUF2QixDQURBO0FBRUFJLFFBQUFBLE9BQU8sQ0FBQ0UsY0FBUixDQUF1Qk4sVUFBdkIsRUFBbUMsVUFBbkMsQ0FGSjtBQUdFO0FBQ0UsaUJBQU9JLE9BQU8sQ0FBQ0UsY0FBUixDQUF1Qk4sVUFBdkIsRUFBbUMsUUFBbkMsQ0FBUDtBQUNIO0FBQ0RJLFFBQUFBLE9BQU8sQ0FBQ0UsY0FBUixHQUF5QixFQUF6QjtBQUNBRixRQUFBQSxPQUFPLENBQUNFLGNBQVIsQ0FBdUJOLFVBQXZCLElBQXFDLEVBQXJDO0FBQ0EsWUFBSU8sUUFBUSxHQUFHLE1BQU1SLE1BQU0sQ0FBQ0ksS0FBUCxDQUFhQyxPQUFiLEVBQXNCQyxhQUF0QixDQUFyQjtBQUNBRCxRQUFBQSxPQUFPLENBQUNFLGNBQVIsQ0FBdUJOLFVBQXZCLEVBQW1DLFVBQW5DLElBQWlELElBQWpEO0FBQ0FJLFFBQUFBLE9BQU8sQ0FBQ0UsY0FBUixDQUF1Qk4sVUFBdkIsRUFBbUMsUUFBbkMsSUFBK0NPLFFBQS9DO0FBQ0EsZUFBT0EsUUFBUDtBQUNILE9BZGdDLEVBQWxCLENBQW5COztBQWdCQSxXQUFPTixVQUFQO0FBQ0gsR0FuQkQ7QUFvQkg7Ozs7OztBQU1NLFNBQVNPLGNBQVQsR0FBMEI7QUFDN0IsU0FBTyxDQUFDVCxNQUFELEVBQVNDLFVBQVQsRUFBcUJDLFVBQXJCLEtBQW9DO0FBQ3ZDLFFBQUlyQixNQUFNLEdBQUdtQixNQUFNLENBQUNDLFVBQUQsQ0FBbkI7QUFDQUMsSUFBQUEsVUFBVSxDQUFDYixLQUFYLEdBQW1CLElBQUljLEtBQUosQ0FBVXRCLE1BQVYsRUFBa0I7QUFDakN1QixNQUFBQSxLQUFLLEVBQUUsT0FBT0osTUFBUCxFQUFlSyxPQUFmLEVBQXdCQyxhQUF4QixLQUEwQztBQUM3Q0QsUUFBQUEsT0FBTyxDQUFDSSxjQUFSLEdBQTBCSixPQUFPLENBQUNqQixHQUFULEdBQWdCLFFBQWhCLEdBQTJCLFVBQXBEO0FBQ0EsZUFBTyxNQUFNWSxNQUFNLENBQUNJLEtBQVAsQ0FBYUMsT0FBYixFQUFzQkMsYUFBdEIsQ0FBYjtBQUNILE9BSmdDLEVBQWxCLENBQW5COztBQU1BLFdBQU9KLFVBQVA7QUFDSCxHQVREO0FBVUgiLCJzb3VyY2VzQ29udGVudCI6WyJleHBvcnQgZnVuY3Rpb24gYWRkKHsgdG8gPSAnc3RhdGljJyB9LCBtZXRob2QpIHtcclxuICAgIHJldHVybiBDbGFzcyA9PiB7XHJcbiAgICAgICAgbGV0IHRhcmdldFJlZmVyZW5jZTtcclxuICAgICAgICBzd2l0Y2ggKHRvKSB7XHJcbiAgICAgICAgICAgIGNhc2UgJ3Byb3RvdHlwZSc6XHJcbiAgICAgICAgICAgICAgICB0YXJnZXRSZWZlcmVuY2UgPSBDbGFzcy5wcm90b3R5cGVcclxuICAgICAgICAgICAgYnJlYWs7XHJcbiAgICAgICAgICAgIGNhc2UgJ3N0YXRpYyc6XHJcbiAgICAgICAgICAgIGRlZmF1bHQ6XHJcbiAgICAgICAgICAgICAgICB0YXJnZXRSZWZlcmVuY2UgPSBDbGFzc1xyXG4gICAgICAgICAgICBicmVhaztcclxuICAgICAgICB9XHJcbiAgICAgICAgT2JqZWN0LmVudHJpZXMobWV0aG9kKS5mb3JFYWNoKFxyXG4gICAgICAgICAgICAoW2tleSwgdmFsdWVdKSA9PiB0YXJnZXRSZWZlcmVuY2Vba2V5XSA9IHZhbHVlXHJcbiAgICAgICAgKVxyXG4gICAgICAgIHJldHVybiBDbGFzc1xyXG4gICAgfVxyXG59XHJcblxyXG5leHBvcnQgZnVuY3Rpb24gZXhlY3V0ZSh7IHN0YXRpY01ldGhvZCwgc2VsZiA9IHRydWUsIGFyZ3MgPSBbXSB9KSB7XHJcbiAgICAvLyByZXR1cm4gYSBkZWNvcmF0b3IgZnVuY3Rpb25cclxuICAgIHJldHVybiB0YXJnZXRDbGFzcyA9PiB7XHJcbiAgICAgICAgaWYoc2VsZikgYXJncy51bnNoaWZ0KHRhcmdldENsYXNzKSAvLyBhZGQgdG8gYmVnaW5uaW5nIFxyXG4gICAgICAgIHRhcmdldENsYXNzW3N0YXRpY01ldGhvZF0oLi4uYXJncylcclxuICAgICAgICByZXR1cm4gdGFyZ2V0Q2xhc3NcclxuICAgIH1cclxufVxyXG5cclxuLy8gQXBwbHkgZGVjb3JhdG9yIG9ubHkgaWYgY29uZGl0aW9uIGlzIHRydWVcclxuZXhwb3J0IGZ1bmN0aW9uIGNvbmRpdGlvbmFsKHsgY29uZGl0aW9uID0gdHJ1ZSwgZGVjb3JhdG9yIH0pIHtcclxuICAgIHJldHVybiAoY29uZGl0aW9uKSA/IGRlY29yYXRvciA6IENsYXNzID0+IHsgcmV0dXJuIENsYXNzIH0gOyBcclxufVxyXG5cclxuLyoqIFxyXG4gKiBtZXRob2QgZGVjb3JhdG9yIHRvIGV4ZWN1dGUgbWV0aG9kIG9ubHkgb25jZSBvbiBpbnN0YW5jZS4gY2FjaGluZyB0aGUgcmVzdWx0IG9mIHRoZSBmaXJzdCBleGVjdXRpb24gdG8gcmV0dXJuIGl0IG9uIHN1YnNlcXVlbnQgY2FsbHMuXHJcbiAqIFRyYWNrcyBleGVjdXRpb24gdXNpbmcgJ2V4ZWN1dGVkbWV0aG9kJyBvYmplY3QsIHdoaWNoIGl0IGFkZHMgdG8gdGhpcyBhcmd1bWVudC5cclxuKi9cclxuZXhwb3J0IGZ1bmN0aW9uIGV4ZWN1dGVPbmNlRm9yRWFjaEluc3RhbmNlKCkgeyAvLyBkZWNvcmF0b3IgKyBwcm94eVxyXG4gICAgcmV0dXJuICh0YXJnZXQsIG1ldGhvZE5hbWUsIGRlc2NyaXB0b3IpID0+IHtcclxuICAgICAgICBsZXQgbWV0aG9kID0gdGFyZ2V0W21ldGhvZE5hbWVdXHJcbiAgICAgICAgZGVzY3JpcHRvci52YWx1ZSA9IG5ldyBQcm94eShtZXRob2QsIHtcclxuICAgICAgICAgICAgYXBwbHk6IGFzeW5jICh0YXJnZXQsIHRoaXNBcmcsIGFyZ3VtZW50c0xpc3QpID0+IHtcclxuICAgICAgICAgICAgICAgIGlmKCB0aGlzQXJnLmV4ZWN1dGVkbWV0aG9kICYmIFxyXG4gICAgICAgICAgICAgICAgICAgIHRoaXNBcmcuZXhlY3V0ZWRtZXRob2RbbWV0aG9kTmFtZV0gJiZcclxuICAgICAgICAgICAgICAgICAgICB0aGlzQXJnLmV4ZWN1dGVkbWV0aG9kW21ldGhvZE5hbWVdWydleGVjdXRlZCddXHJcbiAgICAgICAgICAgICAgICApIHtcclxuICAgICAgICAgICAgICAgICAgICByZXR1cm4gdGhpc0FyZy5leGVjdXRlZG1ldGhvZFttZXRob2ROYW1lXVsncmVzdWx0J11cclxuICAgICAgICAgICAgICAgIH1cclxuICAgICAgICAgICAgICAgIHRoaXNBcmcuZXhlY3V0ZWRtZXRob2QgPSB7fVxyXG4gICAgICAgICAgICAgICAgdGhpc0FyZy5leGVjdXRlZG1ldGhvZFttZXRob2ROYW1lXSA9IHt9XHJcbiAgICAgICAgICAgICAgICBsZXQgaW5zdGFuY2UgPSBhd2FpdCB0YXJnZXQuYXBwbHkodGhpc0FyZywgYXJndW1lbnRzTGlzdClcclxuICAgICAgICAgICAgICAgIHRoaXNBcmcuZXhlY3V0ZWRtZXRob2RbbWV0aG9kTmFtZV1bJ2V4ZWN1dGVkJ10gPSB0cnVlXHJcbiAgICAgICAgICAgICAgICB0aGlzQXJnLmV4ZWN1dGVkbWV0aG9kW21ldGhvZE5hbWVdWydyZXN1bHQnXSA9IGluc3RhbmNlXHJcbiAgICAgICAgICAgICAgICByZXR1cm4gaW5zdGFuY2VcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH0pXHJcbiAgICAgICAgcmV0dXJuIGRlc2NyaXB0b3JcclxuICAgIH1cclxufVxyXG5cclxuLyoqIFxyXG4gKiBtZXRob2QgZGVjb3JhdG9yIHRvIGNoZWNrIGlmIG5lc3RlZFVuaXQgaXMgcGFyZW50IG9yIGNoaWxkLCBpLmUuIHRvcCBsZXZlbCBvciBuZXN0ZWQgbGV2ZWxzLlxyXG4gKiBBZGRzIFwiZXhlY3V0aW9uTGV2ZWxcIiBwcm9wZXJ0eSB0byB0aGlzIGFyZ3VtZW50LlxyXG4qL1xyXG5leHBvcnQgZnVuY3Rpb24gZXhlY3V0aW9uTGV2ZWwoKSB7IC8vIGRlY29yYXRvciArIHByb3h5XHJcbiAgICByZXR1cm4gKHRhcmdldCwgbWV0aG9kTmFtZSwgZGVzY3JpcHRvcikgPT4ge1xyXG4gICAgICAgIGxldCBtZXRob2QgPSB0YXJnZXRbbWV0aG9kTmFtZV1cclxuICAgICAgICBkZXNjcmlwdG9yLnZhbHVlID0gbmV3IFByb3h5KG1ldGhvZCwge1xyXG4gICAgICAgICAgICBhcHBseTogYXN5bmMgKHRhcmdldCwgdGhpc0FyZywgYXJndW1lbnRzTGlzdCkgPT4ge1xyXG4gICAgICAgICAgICAgICAgdGhpc0FyZy5leGVjdXRpb25MZXZlbCA9ICh0aGlzQXJnLmtleSkgPyAnbmVzdGVkJyA6ICd0b3BMZXZlbCdcclxuICAgICAgICAgICAgICAgIHJldHVybiBhd2FpdCB0YXJnZXQuYXBwbHkodGhpc0FyZywgYXJndW1lbnRzTGlzdClcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH0pXHJcbiAgICAgICAgcmV0dXJuIGRlc2NyaXB0b3JcclxuICAgIH1cclxufVxyXG4iXX0=

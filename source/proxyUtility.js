@@ -1,67 +1,68 @@
-/**
- * Create a proxy handler object with all traps reflected to an input target object.
- */
-export function createProxyHandlerReflectedToTargetObject({ 
-    target, // target object to reflect all traps to.
-    trapHandler = {}, // object of proxy traps
-    // list of all proxy traps methods available for non-constructor objects.
-    nonConstructorTrapNameList = ['get', 'set', 'deleteProperty', 'enumerate', 'ownKeys', 'has', 'defineProperty', 'getOwnPropertyDescriptor', 'getPrototypeOf', 'setPrototypeOf', 'isExtensible', 'preventExtensions'],
-    // list of additional traps for constructor objects
-    constructorTrapNameList = ['construct', 'apply']
-}) {
-    let trapNameList;
+"use strict";Object.defineProperty(exports, "__esModule", { value: true });exports.createProxyHandlerReflectedToTargetObject = createProxyHandlerReflectedToTargetObject;exports.addRequiredPropertyForConstructorProxy = addRequiredPropertyForConstructorProxy;
 
-    // Pick relevant trap names depending on object type (constructor i.e. function or non constructor objects)
-    if(typeof target == 'function') {
-        trapNameList = nonConstructorTrapNameList.concat(constructorTrapNameList)
-    } else {
-        trapNameList = nonConstructorTrapNameList
-    }
 
-    trapHandler = trapNameList.reduce((accumulator, trapName) => {
-        // trap method reflected to target object. When called it will pass the arguments to target Object equivalent operation.
-        accumulator[trapName] = function(originalTarger, ...args) {
-            return Reflect[trapName](target, ...args)
-        }
-        return accumulator
-    }, trapHandler);
-    return trapHandler
+function createProxyHandlerReflectedToTargetObject({
+  target,
+  trapHandler = {},
+
+  nonConstructorTrapNameList = ['get', 'set', 'deleteProperty', 'enumerate', 'ownKeys', 'has', 'defineProperty', 'getOwnPropertyDescriptor', 'getPrototypeOf', 'setPrototypeOf', 'isExtensible', 'preventExtensions'],
+
+  constructorTrapNameList = ['construct', 'apply'] })
+{
+  let trapNameList;
+
+
+  if (typeof target == 'function') {
+    trapNameList = nonConstructorTrapNameList.concat(constructorTrapNameList);
+  } else {
+    trapNameList = nonConstructorTrapNameList;
+  }
+
+  trapHandler = trapNameList.reduce((accumulator, trapName) => {
+
+    accumulator[trapName] = function (originalTarger, ...args) {
+      return Reflect[trapName](target, ...args);
+    };
+    return accumulator;
+  }, trapHandler);
+  return trapHandler;
 }
 
-/*
- * Ensures that constructor proxy traps comply with JS specification https://tc39.github.io/ecma262/#sec-proxy-object-internal-methods-and-internal-slots-ownpropertykeys.
- * Where it adds required values for constructor proxy targets as specified in spec. Fixes issue of creating non costructor object traps for a constructor proxy target.
- * IMPORTANT: Creating a proxy of a function with traps targeting objects must return 'arguments' as property when 'ownKeys' trap is called as is degined in the spec https://stackoverflow.com/questions/39811021/typeerror-ownkeys-on-proxy-trap-result-did-not-include-arguments/42876020
- * While using arrow functions for bypassing the requirement for 'arguments' to be present, it will fail in instantiation of new instance (arrow functions do not have 'this', and thus cannot be used as constructors) 
- */
-export function addRequiredPropertyForConstructorProxy({ 
-    proxyHandler, 
-    constructor = new Function() // the proxied constructor or by default use a dummy function to mimic a constructor behavior.
-}) {
-    function ensurePropertyExistFor_ownKeysTrap({ targetTrap }) {
-        return (...args) => {
-            let array = targetTrap(...args)
-            if(!array.includes('arguments')) array.push('arguments')
-            if(!array.includes('prototype')) array.push('prototype')
-            return array
+
+
+
+
+
+
+function addRequiredPropertyForConstructorProxy({
+  proxyHandler,
+  constructor = new Function() })
+{
+  function ensurePropertyExistFor_ownKeysTrap({ targetTrap }) {
+    return (...args) => {
+      let array = targetTrap(...args);
+      if (!array.includes('arguments')) array.push('arguments');
+      if (!array.includes('prototype')) array.push('prototype');
+      return array;
+    };
+  }
+  function ensurePropertyExistFor_getOwnPropertyDescriptorTrap({ targetTrap }) {
+    return (...args) => {
+      let property = args[1];
+      let object = targetTrap(...args);
+      if (!object) {
+        if (property == 'constructor') {
+          object = Object.getOwnPropertyDescriptor(constructor, 'constructor');
         }
-    }
-    function ensurePropertyExistFor_getOwnPropertyDescriptorTrap({ targetTrap }) {
-        return (...args) => {
-            let property = args[1]
-            let object = targetTrap(...args)
-            if(!object) {
-                if(property == 'constructor') { 
-                    object = Object.getOwnPropertyDescriptor(constructor, 'constructor')
-                }
-                if(property == 'prototype') { 
-                    object = Object.getOwnPropertyDescriptor(constructor, 'prototype')
-                }
-            }
-            return object
+        if (property == 'prototype') {
+          object = Object.getOwnPropertyDescriptor(constructor, 'prototype');
         }
-    }
-    if(proxyHandler['ownKeys']) proxyHandler['ownKeys'] = ensurePropertyExistFor_ownKeysTrap({ targetTrap: proxyHandler['ownKeys'] })
-    if(proxyHandler['getOwnPropertyDescriptor']) proxyHandler['getOwnPropertyDescriptor'] = ensurePropertyExistFor_getOwnPropertyDescriptorTrap({ targetTrap: proxyHandler['getOwnPropertyDescriptor'] })
-    return proxyHandler
+      }
+      return object;
+    };
+  }
+  if (proxyHandler['ownKeys']) proxyHandler['ownKeys'] = ensurePropertyExistFor_ownKeysTrap({ targetTrap: proxyHandler['ownKeys'] });
+  if (proxyHandler['getOwnPropertyDescriptor']) proxyHandler['getOwnPropertyDescriptor'] = ensurePropertyExistFor_getOwnPropertyDescriptorTrap({ targetTrap: proxyHandler['getOwnPropertyDescriptor'] });
+  return proxyHandler;
 }
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uLy4uL3NvdXJjZS9wcm94eVV0aWxpdHkuanMiXSwibmFtZXMiOlsiY3JlYXRlUHJveHlIYW5kbGVyUmVmbGVjdGVkVG9UYXJnZXRPYmplY3QiLCJ0YXJnZXQiLCJ0cmFwSGFuZGxlciIsIm5vbkNvbnN0cnVjdG9yVHJhcE5hbWVMaXN0IiwiY29uc3RydWN0b3JUcmFwTmFtZUxpc3QiLCJ0cmFwTmFtZUxpc3QiLCJjb25jYXQiLCJyZWR1Y2UiLCJhY2N1bXVsYXRvciIsInRyYXBOYW1lIiwib3JpZ2luYWxUYXJnZXIiLCJhcmdzIiwiUmVmbGVjdCIsImFkZFJlcXVpcmVkUHJvcGVydHlGb3JDb25zdHJ1Y3RvclByb3h5IiwicHJveHlIYW5kbGVyIiwiY29uc3RydWN0b3IiLCJGdW5jdGlvbiIsImVuc3VyZVByb3BlcnR5RXhpc3RGb3Jfb3duS2V5c1RyYXAiLCJ0YXJnZXRUcmFwIiwiYXJyYXkiLCJpbmNsdWRlcyIsInB1c2giLCJlbnN1cmVQcm9wZXJ0eUV4aXN0Rm9yX2dldE93blByb3BlcnR5RGVzY3JpcHRvclRyYXAiLCJwcm9wZXJ0eSIsIm9iamVjdCIsIk9iamVjdCIsImdldE93blByb3BlcnR5RGVzY3JpcHRvciJdLCJtYXBwaW5ncyI6Ijs7O0FBR08sU0FBU0EseUNBQVQsQ0FBbUQ7QUFDdERDLEVBQUFBLE1BRHNEO0FBRXREQyxFQUFBQSxXQUFXLEdBQUcsRUFGd0M7O0FBSXREQyxFQUFBQSwwQkFBMEIsR0FBRyxDQUFDLEtBQUQsRUFBUSxLQUFSLEVBQWUsZ0JBQWYsRUFBaUMsV0FBakMsRUFBOEMsU0FBOUMsRUFBeUQsS0FBekQsRUFBZ0UsZ0JBQWhFLEVBQWtGLDBCQUFsRixFQUE4RyxnQkFBOUcsRUFBZ0ksZ0JBQWhJLEVBQWtKLGNBQWxKLEVBQWtLLG1CQUFsSyxDQUp5Qjs7QUFNdERDLEVBQUFBLHVCQUF1QixHQUFHLENBQUMsV0FBRCxFQUFjLE9BQWQsQ0FONEIsRUFBbkQ7QUFPSjtBQUNDLE1BQUlDLFlBQUo7OztBQUdBLE1BQUcsT0FBT0osTUFBUCxJQUFpQixVQUFwQixFQUFnQztBQUM1QkksSUFBQUEsWUFBWSxHQUFHRiwwQkFBMEIsQ0FBQ0csTUFBM0IsQ0FBa0NGLHVCQUFsQyxDQUFmO0FBQ0gsR0FGRCxNQUVPO0FBQ0hDLElBQUFBLFlBQVksR0FBR0YsMEJBQWY7QUFDSDs7QUFFREQsRUFBQUEsV0FBVyxHQUFHRyxZQUFZLENBQUNFLE1BQWIsQ0FBb0IsQ0FBQ0MsV0FBRCxFQUFjQyxRQUFkLEtBQTJCOztBQUV6REQsSUFBQUEsV0FBVyxDQUFDQyxRQUFELENBQVgsR0FBd0IsVUFBU0MsY0FBVCxFQUF5QixHQUFHQyxJQUE1QixFQUFrQztBQUN0RCxhQUFPQyxPQUFPLENBQUNILFFBQUQsQ0FBUCxDQUFrQlIsTUFBbEIsRUFBMEIsR0FBR1UsSUFBN0IsQ0FBUDtBQUNILEtBRkQ7QUFHQSxXQUFPSCxXQUFQO0FBQ0gsR0FOYSxFQU1YTixXQU5XLENBQWQ7QUFPQSxTQUFPQSxXQUFQO0FBQ0g7Ozs7Ozs7O0FBUU0sU0FBU1csc0NBQVQsQ0FBZ0Q7QUFDbkRDLEVBQUFBLFlBRG1EO0FBRW5EQyxFQUFBQSxXQUFXLEdBQUcsSUFBSUMsUUFBSixFQUZxQyxFQUFoRDtBQUdKO0FBQ0MsV0FBU0Msa0NBQVQsQ0FBNEMsRUFBRUMsVUFBRixFQUE1QyxFQUE0RDtBQUN4RCxXQUFPLENBQUMsR0FBR1AsSUFBSixLQUFhO0FBQ2hCLFVBQUlRLEtBQUssR0FBR0QsVUFBVSxDQUFDLEdBQUdQLElBQUosQ0FBdEI7QUFDQSxVQUFHLENBQUNRLEtBQUssQ0FBQ0MsUUFBTixDQUFlLFdBQWYsQ0FBSixFQUFpQ0QsS0FBSyxDQUFDRSxJQUFOLENBQVcsV0FBWDtBQUNqQyxVQUFHLENBQUNGLEtBQUssQ0FBQ0MsUUFBTixDQUFlLFdBQWYsQ0FBSixFQUFpQ0QsS0FBSyxDQUFDRSxJQUFOLENBQVcsV0FBWDtBQUNqQyxhQUFPRixLQUFQO0FBQ0gsS0FMRDtBQU1IO0FBQ0QsV0FBU0csbURBQVQsQ0FBNkQsRUFBRUosVUFBRixFQUE3RCxFQUE2RTtBQUN6RSxXQUFPLENBQUMsR0FBR1AsSUFBSixLQUFhO0FBQ2hCLFVBQUlZLFFBQVEsR0FBR1osSUFBSSxDQUFDLENBQUQsQ0FBbkI7QUFDQSxVQUFJYSxNQUFNLEdBQUdOLFVBQVUsQ0FBQyxHQUFHUCxJQUFKLENBQXZCO0FBQ0EsVUFBRyxDQUFDYSxNQUFKLEVBQVk7QUFDUixZQUFHRCxRQUFRLElBQUksYUFBZixFQUE4QjtBQUMxQkMsVUFBQUEsTUFBTSxHQUFHQyxNQUFNLENBQUNDLHdCQUFQLENBQWdDWCxXQUFoQyxFQUE2QyxhQUE3QyxDQUFUO0FBQ0g7QUFDRCxZQUFHUSxRQUFRLElBQUksV0FBZixFQUE0QjtBQUN4QkMsVUFBQUEsTUFBTSxHQUFHQyxNQUFNLENBQUNDLHdCQUFQLENBQWdDWCxXQUFoQyxFQUE2QyxXQUE3QyxDQUFUO0FBQ0g7QUFDSjtBQUNELGFBQU9TLE1BQVA7QUFDSCxLQVpEO0FBYUg7QUFDRCxNQUFHVixZQUFZLENBQUMsU0FBRCxDQUFmLEVBQTRCQSxZQUFZLENBQUMsU0FBRCxDQUFaLEdBQTBCRyxrQ0FBa0MsQ0FBQyxFQUFFQyxVQUFVLEVBQUVKLFlBQVksQ0FBQyxTQUFELENBQTFCLEVBQUQsQ0FBNUQ7QUFDNUIsTUFBR0EsWUFBWSxDQUFDLDBCQUFELENBQWYsRUFBNkNBLFlBQVksQ0FBQywwQkFBRCxDQUFaLEdBQTJDUSxtREFBbUQsQ0FBQyxFQUFFSixVQUFVLEVBQUVKLFlBQVksQ0FBQywwQkFBRCxDQUExQixFQUFELENBQTlGO0FBQzdDLFNBQU9BLFlBQVA7QUFDSCIsInNvdXJjZXNDb250ZW50IjpbIi8qKlxuICogQ3JlYXRlIGEgcHJveHkgaGFuZGxlciBvYmplY3Qgd2l0aCBhbGwgdHJhcHMgcmVmbGVjdGVkIHRvIGFuIGlucHV0IHRhcmdldCBvYmplY3QuXG4gKi9cbmV4cG9ydCBmdW5jdGlvbiBjcmVhdGVQcm94eUhhbmRsZXJSZWZsZWN0ZWRUb1RhcmdldE9iamVjdCh7IFxuICAgIHRhcmdldCwgLy8gdGFyZ2V0IG9iamVjdCB0byByZWZsZWN0IGFsbCB0cmFwcyB0by5cbiAgICB0cmFwSGFuZGxlciA9IHt9LCAvLyBvYmplY3Qgb2YgcHJveHkgdHJhcHNcbiAgICAvLyBsaXN0IG9mIGFsbCBwcm94eSB0cmFwcyBtZXRob2RzIGF2YWlsYWJsZSBmb3Igbm9uLWNvbnN0cnVjdG9yIG9iamVjdHMuXG4gICAgbm9uQ29uc3RydWN0b3JUcmFwTmFtZUxpc3QgPSBbJ2dldCcsICdzZXQnLCAnZGVsZXRlUHJvcGVydHknLCAnZW51bWVyYXRlJywgJ293bktleXMnLCAnaGFzJywgJ2RlZmluZVByb3BlcnR5JywgJ2dldE93blByb3BlcnR5RGVzY3JpcHRvcicsICdnZXRQcm90b3R5cGVPZicsICdzZXRQcm90b3R5cGVPZicsICdpc0V4dGVuc2libGUnLCAncHJldmVudEV4dGVuc2lvbnMnXSxcbiAgICAvLyBsaXN0IG9mIGFkZGl0aW9uYWwgdHJhcHMgZm9yIGNvbnN0cnVjdG9yIG9iamVjdHNcbiAgICBjb25zdHJ1Y3RvclRyYXBOYW1lTGlzdCA9IFsnY29uc3RydWN0JywgJ2FwcGx5J11cbn0pIHtcbiAgICBsZXQgdHJhcE5hbWVMaXN0O1xuXG4gICAgLy8gUGljayByZWxldmFudCB0cmFwIG5hbWVzIGRlcGVuZGluZyBvbiBvYmplY3QgdHlwZSAoY29uc3RydWN0b3IgaS5lLiBmdW5jdGlvbiBvciBub24gY29uc3RydWN0b3Igb2JqZWN0cylcbiAgICBpZih0eXBlb2YgdGFyZ2V0ID09ICdmdW5jdGlvbicpIHtcbiAgICAgICAgdHJhcE5hbWVMaXN0ID0gbm9uQ29uc3RydWN0b3JUcmFwTmFtZUxpc3QuY29uY2F0KGNvbnN0cnVjdG9yVHJhcE5hbWVMaXN0KVxuICAgIH0gZWxzZSB7XG4gICAgICAgIHRyYXBOYW1lTGlzdCA9IG5vbkNvbnN0cnVjdG9yVHJhcE5hbWVMaXN0XG4gICAgfVxuXG4gICAgdHJhcEhhbmRsZXIgPSB0cmFwTmFtZUxpc3QucmVkdWNlKChhY2N1bXVsYXRvciwgdHJhcE5hbWUpID0+IHtcbiAgICAgICAgLy8gdHJhcCBtZXRob2QgcmVmbGVjdGVkIHRvIHRhcmdldCBvYmplY3QuIFdoZW4gY2FsbGVkIGl0IHdpbGwgcGFzcyB0aGUgYXJndW1lbnRzIHRvIHRhcmdldCBPYmplY3QgZXF1aXZhbGVudCBvcGVyYXRpb24uXG4gICAgICAgIGFjY3VtdWxhdG9yW3RyYXBOYW1lXSA9IGZ1bmN0aW9uKG9yaWdpbmFsVGFyZ2VyLCAuLi5hcmdzKSB7XG4gICAgICAgICAgICByZXR1cm4gUmVmbGVjdFt0cmFwTmFtZV0odGFyZ2V0LCAuLi5hcmdzKVxuICAgICAgICB9XG4gICAgICAgIHJldHVybiBhY2N1bXVsYXRvclxuICAgIH0sIHRyYXBIYW5kbGVyKTtcbiAgICByZXR1cm4gdHJhcEhhbmRsZXJcbn1cblxuLypcbiAqIEVuc3VyZXMgdGhhdCBjb25zdHJ1Y3RvciBwcm94eSB0cmFwcyBjb21wbHkgd2l0aCBKUyBzcGVjaWZpY2F0aW9uIGh0dHBzOi8vdGMzOS5naXRodWIuaW8vZWNtYTI2Mi8jc2VjLXByb3h5LW9iamVjdC1pbnRlcm5hbC1tZXRob2RzLWFuZC1pbnRlcm5hbC1zbG90cy1vd25wcm9wZXJ0eWtleXMuXG4gKiBXaGVyZSBpdCBhZGRzIHJlcXVpcmVkIHZhbHVlcyBmb3IgY29uc3RydWN0b3IgcHJveHkgdGFyZ2V0cyBhcyBzcGVjaWZpZWQgaW4gc3BlYy4gRml4ZXMgaXNzdWUgb2YgY3JlYXRpbmcgbm9uIGNvc3RydWN0b3Igb2JqZWN0IHRyYXBzIGZvciBhIGNvbnN0cnVjdG9yIHByb3h5IHRhcmdldC5cbiAqIElNUE9SVEFOVDogQ3JlYXRpbmcgYSBwcm94eSBvZiBhIGZ1bmN0aW9uIHdpdGggdHJhcHMgdGFyZ2V0aW5nIG9iamVjdHMgbXVzdCByZXR1cm4gJ2FyZ3VtZW50cycgYXMgcHJvcGVydHkgd2hlbiAnb3duS2V5cycgdHJhcCBpcyBjYWxsZWQgYXMgaXMgZGVnaW5lZCBpbiB0aGUgc3BlYyBodHRwczovL3N0YWNrb3ZlcmZsb3cuY29tL3F1ZXN0aW9ucy8zOTgxMTAyMS90eXBlZXJyb3Itb3dua2V5cy1vbi1wcm94eS10cmFwLXJlc3VsdC1kaWQtbm90LWluY2x1ZGUtYXJndW1lbnRzLzQyODc2MDIwXG4gKiBXaGlsZSB1c2luZyBhcnJvdyBmdW5jdGlvbnMgZm9yIGJ5cGFzc2luZyB0aGUgcmVxdWlyZW1lbnQgZm9yICdhcmd1bWVudHMnIHRvIGJlIHByZXNlbnQsIGl0IHdpbGwgZmFpbCBpbiBpbnN0YW50aWF0aW9uIG9mIG5ldyBpbnN0YW5jZSAoYXJyb3cgZnVuY3Rpb25zIGRvIG5vdCBoYXZlICd0aGlzJywgYW5kIHRodXMgY2Fubm90IGJlIHVzZWQgYXMgY29uc3RydWN0b3JzKSBcbiAqL1xuZXhwb3J0IGZ1bmN0aW9uIGFkZFJlcXVpcmVkUHJvcGVydHlGb3JDb25zdHJ1Y3RvclByb3h5KHsgXG4gICAgcHJveHlIYW5kbGVyLCBcbiAgICBjb25zdHJ1Y3RvciA9IG5ldyBGdW5jdGlvbigpIC8vIHRoZSBwcm94aWVkIGNvbnN0cnVjdG9yIG9yIGJ5IGRlZmF1bHQgdXNlIGEgZHVtbXkgZnVuY3Rpb24gdG8gbWltaWMgYSBjb25zdHJ1Y3RvciBiZWhhdmlvci5cbn0pIHtcbiAgICBmdW5jdGlvbiBlbnN1cmVQcm9wZXJ0eUV4aXN0Rm9yX293bktleXNUcmFwKHsgdGFyZ2V0VHJhcCB9KSB7XG4gICAgICAgIHJldHVybiAoLi4uYXJncykgPT4ge1xuICAgICAgICAgICAgbGV0IGFycmF5ID0gdGFyZ2V0VHJhcCguLi5hcmdzKVxuICAgICAgICAgICAgaWYoIWFycmF5LmluY2x1ZGVzKCdhcmd1bWVudHMnKSkgYXJyYXkucHVzaCgnYXJndW1lbnRzJylcbiAgICAgICAgICAgIGlmKCFhcnJheS5pbmNsdWRlcygncHJvdG90eXBlJykpIGFycmF5LnB1c2goJ3Byb3RvdHlwZScpXG4gICAgICAgICAgICByZXR1cm4gYXJyYXlcbiAgICAgICAgfVxuICAgIH1cbiAgICBmdW5jdGlvbiBlbnN1cmVQcm9wZXJ0eUV4aXN0Rm9yX2dldE93blByb3BlcnR5RGVzY3JpcHRvclRyYXAoeyB0YXJnZXRUcmFwIH0pIHtcbiAgICAgICAgcmV0dXJuICguLi5hcmdzKSA9PiB7XG4gICAgICAgICAgICBsZXQgcHJvcGVydHkgPSBhcmdzWzFdXG4gICAgICAgICAgICBsZXQgb2JqZWN0ID0gdGFyZ2V0VHJhcCguLi5hcmdzKVxuICAgICAgICAgICAgaWYoIW9iamVjdCkge1xuICAgICAgICAgICAgICAgIGlmKHByb3BlcnR5ID09ICdjb25zdHJ1Y3RvcicpIHsgXG4gICAgICAgICAgICAgICAgICAgIG9iamVjdCA9IE9iamVjdC5nZXRPd25Qcm9wZXJ0eURlc2NyaXB0b3IoY29uc3RydWN0b3IsICdjb25zdHJ1Y3RvcicpXG4gICAgICAgICAgICAgICAgfVxuICAgICAgICAgICAgICAgIGlmKHByb3BlcnR5ID09ICdwcm90b3R5cGUnKSB7IFxuICAgICAgICAgICAgICAgICAgICBvYmplY3QgPSBPYmplY3QuZ2V0T3duUHJvcGVydHlEZXNjcmlwdG9yKGNvbnN0cnVjdG9yLCAncHJvdG90eXBlJylcbiAgICAgICAgICAgICAgICB9XG4gICAgICAgICAgICB9XG4gICAgICAgICAgICByZXR1cm4gb2JqZWN0XG4gICAgICAgIH1cbiAgICB9XG4gICAgaWYocHJveHlIYW5kbGVyWydvd25LZXlzJ10pIHByb3h5SGFuZGxlclsnb3duS2V5cyddID0gZW5zdXJlUHJvcGVydHlFeGlzdEZvcl9vd25LZXlzVHJhcCh7IHRhcmdldFRyYXA6IHByb3h5SGFuZGxlclsnb3duS2V5cyddIH0pXG4gICAgaWYocHJveHlIYW5kbGVyWydnZXRPd25Qcm9wZXJ0eURlc2NyaXB0b3InXSkgcHJveHlIYW5kbGVyWydnZXRPd25Qcm9wZXJ0eURlc2NyaXB0b3InXSA9IGVuc3VyZVByb3BlcnR5RXhpc3RGb3JfZ2V0T3duUHJvcGVydHlEZXNjcmlwdG9yVHJhcCh7IHRhcmdldFRyYXA6IHByb3h5SGFuZGxlclsnZ2V0T3duUHJvcGVydHlEZXNjcmlwdG9yJ10gfSlcbiAgICByZXR1cm4gcHJveHlIYW5kbGVyXG59Il19
