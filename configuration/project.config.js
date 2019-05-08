@@ -9,10 +9,10 @@ const ownConfiguration = {
     },
     get distribution() {
       return path.join(ownConfiguration.directory.root, './distribution')
-    }, 
+    },
   },
   entrypoint: {
-    programmaticAPI: './script.js'
+    programmaticAPI: './script.js',
   },
   script,
   transpilation: {
