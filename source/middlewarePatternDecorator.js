@@ -1,11 +1,12 @@
-/*** Function wrapped middleware pattern - the middleware is wrapped with a function and accepts option arguments */
-export function functionWrappedMiddlewareDecorator(func) {
+"use strict";Object.defineProperty(exports, "__esModule", { value: true });exports.functionWrappedMiddlewareDecorator = functionWrappedMiddlewareDecorator;
+function functionWrappedMiddlewareDecorator(func) {
   return new Proxy(func, {
     apply: (target, thisArg, argumentsList) => {
       let middleware = async (context, next) => {
-        await target.apply(thisArg, [context, next, ...argumentsList])
-      }
-      return middleware // returns a middleware after creating a context for argumentsList
-    },
-  })
+        await target.apply(thisArg, [context, next, ...argumentsList]);
+      };
+      return middleware;
+    } });
+
 }
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uLy4uL3NvdXJjZS9taWRkbGV3YXJlUGF0dGVybkRlY29yYXRvci5qcyJdLCJuYW1lcyI6WyJmdW5jdGlvbldyYXBwZWRNaWRkbGV3YXJlRGVjb3JhdG9yIiwiZnVuYyIsIlByb3h5IiwiYXBwbHkiLCJ0YXJnZXQiLCJ0aGlzQXJnIiwiYXJndW1lbnRzTGlzdCIsIm1pZGRsZXdhcmUiLCJjb250ZXh0IiwibmV4dCJdLCJtYXBwaW5ncyI6IjtBQUNPLFNBQVNBLGtDQUFULENBQTRDQyxJQUE1QyxFQUFrRDtBQUN2RCxTQUFPLElBQUlDLEtBQUosQ0FBVUQsSUFBVixFQUFnQjtBQUNyQkUsSUFBQUEsS0FBSyxFQUFFLENBQUNDLE1BQUQsRUFBU0MsT0FBVCxFQUFrQkMsYUFBbEIsS0FBb0M7QUFDekMsVUFBSUMsVUFBVSxHQUFHLE9BQU9DLE9BQVAsRUFBZ0JDLElBQWhCLEtBQXlCO0FBQ3hDLGNBQU1MLE1BQU0sQ0FBQ0QsS0FBUCxDQUFhRSxPQUFiLEVBQXNCLENBQUNHLE9BQUQsRUFBVUMsSUFBVixFQUFnQixHQUFHSCxhQUFuQixDQUF0QixDQUFOO0FBQ0QsT0FGRDtBQUdBLGFBQU9DLFVBQVA7QUFDRCxLQU5vQixFQUFoQixDQUFQOztBQVFEIiwic291cmNlc0NvbnRlbnQiOlsiLyoqKiBGdW5jdGlvbiB3cmFwcGVkIG1pZGRsZXdhcmUgcGF0dGVybiAtIHRoZSBtaWRkbGV3YXJlIGlzIHdyYXBwZWQgd2l0aCBhIGZ1bmN0aW9uIGFuZCBhY2NlcHRzIG9wdGlvbiBhcmd1bWVudHMgKi9cbmV4cG9ydCBmdW5jdGlvbiBmdW5jdGlvbldyYXBwZWRNaWRkbGV3YXJlRGVjb3JhdG9yKGZ1bmMpIHtcbiAgcmV0dXJuIG5ldyBQcm94eShmdW5jLCB7XG4gICAgYXBwbHk6ICh0YXJnZXQsIHRoaXNBcmcsIGFyZ3VtZW50c0xpc3QpID0+IHtcbiAgICAgIGxldCBtaWRkbGV3YXJlID0gYXN5bmMgKGNvbnRleHQsIG5leHQpID0+IHtcbiAgICAgICAgYXdhaXQgdGFyZ2V0LmFwcGx5KHRoaXNBcmcsIFtjb250ZXh0LCBuZXh0LCAuLi5hcmd1bWVudHNMaXN0XSlcbiAgICAgIH1cbiAgICAgIHJldHVybiBtaWRkbGV3YXJlIC8vIHJldHVybnMgYSBtaWRkbGV3YXJlIGFmdGVyIGNyZWF0aW5nIGEgY29udGV4dCBmb3IgYXJndW1lbnRzTGlzdFxuICAgIH0sXG4gIH0pXG59XG4iXX0=
