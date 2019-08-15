@@ -1,5 +1,16 @@
 /**
  * Create a proxy handler object with all traps reflected to the input target object.
+ * e.g. Usage: 
+ ```
+  let instance = {} // non function target
+  let proxyHandler = new Proxy(createProxyHandlerReflectedToTargetObject({ target: instance }), {
+      construct(target, argumentList, proxiedInterfaceInstance) {
+        // trap construct on non function target.
+      },
+  })
+  proxyHandler = addRequiredPropertyForConstructorProxy({ proxyHandler }) // IMPORTANT: ensures that constructor proxy traps comply with Ecmascript proxy specification.
+
+ ```
  */
 export function createProxyHandlerReflectedToTargetObject({
   target, // target object to reflect all traps to.
