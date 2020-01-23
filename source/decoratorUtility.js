@@ -1,61 +1,62 @@
-// Decorator for Native JS Class - Adds method to class as static or prototype method.
-export function add({ to = 'static' }, method) {
+"use strict";Object.defineProperty(exports, "__esModule", { value: true });exports.add = add;exports.execute = execute;exports.conditional = conditional;exports.executeOnceForEachInstance = executeOnceForEachInstance;
+function add({ to = 'static' }, method) {
   return Class => {
-    let targetReference
+    let targetReference;
     switch (to) {
       case 'prototype':
-        targetReference = Class.prototype
-        break
+        targetReference = Class.prototype;
+        break;
       case 'static':
       default:
-        targetReference = Class
-        break
-    }
-    Object.entries(method).forEach(([key, value]) => (targetReference[key] = value))
-    return Class
-  }
+        targetReference = Class;
+        break;}
+
+    Object.entries(method).forEach(([key, value]) => targetReference[key] = value);
+    return Class;
+  };
 }
 
-// Decorator for Native JS Class - Executes a method and allows to reference itself in the method.
-export function execute({ staticMethod, self = true /*pass own class reference*/, args = [] }) {
-  // return a decorator function
+
+function execute({ staticMethod, self = true, args = [] }) {
+
   return targetClass => {
-    if (self) args.unshift(targetClass) // add to beginning
-    targetClass[staticMethod](...args)
-    return targetClass
-  }
+    if (self) args.unshift(targetClass);
+    targetClass[staticMethod](...args);
+    return targetClass;
+  };
 }
 
-// Class decorator that wraps another class decorator - Apply decorator conditionaly
-export function conditional({ condition = true, decorator }) {
-  return condition
-    ? decorator
-    : Class => {
-        return Class
-      }
+
+function conditional({ condition = true, decorator }) {
+  return condition ?
+  decorator :
+  Class => {
+    return Class;
+  };
 }
 
-/**
- * Method decorator to execute method only once on instance. caching the result of the first execution to return it on subsequent calls.
- * Tracks execution using 'executedmethod' object, which it adds to this argument.
- */
-export function executeOnceForEachInstance() {
-  // decorator + proxy
+
+
+
+
+function executeOnceForEachInstance() {
+
   return (target, methodName, descriptor) => {
-    let method = target[methodName]
+    let method = target[methodName];
     descriptor.value = new Proxy(method, {
-      apply: async (target, thisArg /* supposedly the class caller*/, argumentsList) => {
+      apply: async (target, thisArg, argumentsList) => {
         if (thisArg.executedmethod && thisArg.executedmethod[methodName] && thisArg.executedmethod[methodName]['executed']) {
-          return thisArg.executedmethod[methodName]['result']
+          return thisArg.executedmethod[methodName]['result'];
         }
-        thisArg.executedmethod = {}
-        thisArg.executedmethod[methodName] = {}
-        let instance = await target.apply(thisArg, argumentsList)
-        thisArg.executedmethod[methodName]['executed'] = true
-        thisArg.executedmethod[methodName]['result'] = instance
-        return instance
-      },
-    })
-    return descriptor
-  }
+        thisArg.executedmethod = {};
+        thisArg.executedmethod[methodName] = {};
+        let instance = await target.apply(thisArg, argumentsList);
+        thisArg.executedmethod[methodName]['executed'] = true;
+        thisArg.executedmethod[methodName]['result'] = instance;
+        return instance;
+      } });
+
+    return descriptor;
+  };
 }
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uLy4uL3NvdXJjZS9kZWNvcmF0b3JVdGlsaXR5LmpzIl0sIm5hbWVzIjpbImFkZCIsInRvIiwibWV0aG9kIiwiQ2xhc3MiLCJ0YXJnZXRSZWZlcmVuY2UiLCJwcm90b3R5cGUiLCJPYmplY3QiLCJlbnRyaWVzIiwiZm9yRWFjaCIsImtleSIsInZhbHVlIiwiZXhlY3V0ZSIsInN0YXRpY01ldGhvZCIsInNlbGYiLCJhcmdzIiwidGFyZ2V0Q2xhc3MiLCJ1bnNoaWZ0IiwiY29uZGl0aW9uYWwiLCJjb25kaXRpb24iLCJkZWNvcmF0b3IiLCJleGVjdXRlT25jZUZvckVhY2hJbnN0YW5jZSIsInRhcmdldCIsIm1ldGhvZE5hbWUiLCJkZXNjcmlwdG9yIiwiUHJveHkiLCJhcHBseSIsInRoaXNBcmciLCJhcmd1bWVudHNMaXN0IiwiZXhlY3V0ZWRtZXRob2QiLCJpbnN0YW5jZSJdLCJtYXBwaW5ncyI6IjtBQUNPLFNBQVNBLEdBQVQsQ0FBYSxFQUFFQyxFQUFFLEdBQUcsUUFBUCxFQUFiLEVBQWdDQyxNQUFoQyxFQUF3QztBQUM3QyxTQUFPQyxLQUFLLElBQUk7QUFDZCxRQUFJQyxlQUFKO0FBQ0EsWUFBUUgsRUFBUjtBQUNFLFdBQUssV0FBTDtBQUNFRyxRQUFBQSxlQUFlLEdBQUdELEtBQUssQ0FBQ0UsU0FBeEI7QUFDQTtBQUNGLFdBQUssUUFBTDtBQUNBO0FBQ0VELFFBQUFBLGVBQWUsR0FBR0QsS0FBbEI7QUFDQSxjQVBKOztBQVNBRyxJQUFBQSxNQUFNLENBQUNDLE9BQVAsQ0FBZUwsTUFBZixFQUF1Qk0sT0FBdkIsQ0FBK0IsQ0FBQyxDQUFDQyxHQUFELEVBQU1DLEtBQU4sQ0FBRCxLQUFtQk4sZUFBZSxDQUFDSyxHQUFELENBQWYsR0FBdUJDLEtBQXpFO0FBQ0EsV0FBT1AsS0FBUDtBQUNELEdBYkQ7QUFjRDs7O0FBR00sU0FBU1EsT0FBVCxDQUFpQixFQUFFQyxZQUFGLEVBQWdCQyxJQUFJLEdBQUcsSUFBdkIsRUFBMERDLElBQUksR0FBRyxFQUFqRSxFQUFqQixFQUF3Rjs7QUFFN0YsU0FBT0MsV0FBVyxJQUFJO0FBQ3BCLFFBQUlGLElBQUosRUFBVUMsSUFBSSxDQUFDRSxPQUFMLENBQWFELFdBQWI7QUFDVkEsSUFBQUEsV0FBVyxDQUFDSCxZQUFELENBQVgsQ0FBMEIsR0FBR0UsSUFBN0I7QUFDQSxXQUFPQyxXQUFQO0FBQ0QsR0FKRDtBQUtEOzs7QUFHTSxTQUFTRSxXQUFULENBQXFCLEVBQUVDLFNBQVMsR0FBRyxJQUFkLEVBQW9CQyxTQUFwQixFQUFyQixFQUFzRDtBQUMzRCxTQUFPRCxTQUFTO0FBQ1pDLEVBQUFBLFNBRFk7QUFFWmhCLEVBQUFBLEtBQUssSUFBSTtBQUNQLFdBQU9BLEtBQVA7QUFDRCxHQUpMO0FBS0Q7Ozs7OztBQU1NLFNBQVNpQiwwQkFBVCxHQUFzQzs7QUFFM0MsU0FBTyxDQUFDQyxNQUFELEVBQVNDLFVBQVQsRUFBcUJDLFVBQXJCLEtBQW9DO0FBQ3pDLFFBQUlyQixNQUFNLEdBQUdtQixNQUFNLENBQUNDLFVBQUQsQ0FBbkI7QUFDQUMsSUFBQUEsVUFBVSxDQUFDYixLQUFYLEdBQW1CLElBQUljLEtBQUosQ0FBVXRCLE1BQVYsRUFBa0I7QUFDbkN1QixNQUFBQSxLQUFLLEVBQUUsT0FBT0osTUFBUCxFQUFlSyxPQUFmLEVBQXlEQyxhQUF6RCxLQUEyRTtBQUNoRixZQUFJRCxPQUFPLENBQUNFLGNBQVIsSUFBMEJGLE9BQU8sQ0FBQ0UsY0FBUixDQUF1Qk4sVUFBdkIsQ0FBMUIsSUFBZ0VJLE9BQU8sQ0FBQ0UsY0FBUixDQUF1Qk4sVUFBdkIsRUFBbUMsVUFBbkMsQ0FBcEUsRUFBb0g7QUFDbEgsaUJBQU9JLE9BQU8sQ0FBQ0UsY0FBUixDQUF1Qk4sVUFBdkIsRUFBbUMsUUFBbkMsQ0FBUDtBQUNEO0FBQ0RJLFFBQUFBLE9BQU8sQ0FBQ0UsY0FBUixHQUF5QixFQUF6QjtBQUNBRixRQUFBQSxPQUFPLENBQUNFLGNBQVIsQ0FBdUJOLFVBQXZCLElBQXFDLEVBQXJDO0FBQ0EsWUFBSU8sUUFBUSxHQUFHLE1BQU1SLE1BQU0sQ0FBQ0ksS0FBUCxDQUFhQyxPQUFiLEVBQXNCQyxhQUF0QixDQUFyQjtBQUNBRCxRQUFBQSxPQUFPLENBQUNFLGNBQVIsQ0FBdUJOLFVBQXZCLEVBQW1DLFVBQW5DLElBQWlELElBQWpEO0FBQ0FJLFFBQUFBLE9BQU8sQ0FBQ0UsY0FBUixDQUF1Qk4sVUFBdkIsRUFBbUMsUUFBbkMsSUFBK0NPLFFBQS9DO0FBQ0EsZUFBT0EsUUFBUDtBQUNELE9BWGtDLEVBQWxCLENBQW5COztBQWFBLFdBQU9OLFVBQVA7QUFDRCxHQWhCRDtBQWlCRCIsInNvdXJjZXNDb250ZW50IjpbIi8vIERlY29yYXRvciBmb3IgTmF0aXZlIEpTIENsYXNzIC0gQWRkcyBtZXRob2QgdG8gY2xhc3MgYXMgc3RhdGljIG9yIHByb3RvdHlwZSBtZXRob2QuXG5leHBvcnQgZnVuY3Rpb24gYWRkKHsgdG8gPSAnc3RhdGljJyB9LCBtZXRob2QpIHtcbiAgcmV0dXJuIENsYXNzID0+IHtcbiAgICBsZXQgdGFyZ2V0UmVmZXJlbmNlXG4gICAgc3dpdGNoICh0bykge1xuICAgICAgY2FzZSAncHJvdG90eXBlJzpcbiAgICAgICAgdGFyZ2V0UmVmZXJlbmNlID0gQ2xhc3MucHJvdG90eXBlXG4gICAgICAgIGJyZWFrXG4gICAgICBjYXNlICdzdGF0aWMnOlxuICAgICAgZGVmYXVsdDpcbiAgICAgICAgdGFyZ2V0UmVmZXJlbmNlID0gQ2xhc3NcbiAgICAgICAgYnJlYWtcbiAgICB9XG4gICAgT2JqZWN0LmVudHJpZXMobWV0aG9kKS5mb3JFYWNoKChba2V5LCB2YWx1ZV0pID0+ICh0YXJnZXRSZWZlcmVuY2Vba2V5XSA9IHZhbHVlKSlcbiAgICByZXR1cm4gQ2xhc3NcbiAgfVxufVxuXG4vLyBEZWNvcmF0b3IgZm9yIE5hdGl2ZSBKUyBDbGFzcyAtIEV4ZWN1dGVzIGEgbWV0aG9kIGFuZCBhbGxvd3MgdG8gcmVmZXJlbmNlIGl0c2VsZiBpbiB0aGUgbWV0aG9kLlxuZXhwb3J0IGZ1bmN0aW9uIGV4ZWN1dGUoeyBzdGF0aWNNZXRob2QsIHNlbGYgPSB0cnVlIC8qcGFzcyBvd24gY2xhc3MgcmVmZXJlbmNlKi8sIGFyZ3MgPSBbXSB9KSB7XG4gIC8vIHJldHVybiBhIGRlY29yYXRvciBmdW5jdGlvblxuICByZXR1cm4gdGFyZ2V0Q2xhc3MgPT4ge1xuICAgIGlmIChzZWxmKSBhcmdzLnVuc2hpZnQodGFyZ2V0Q2xhc3MpIC8vIGFkZCB0byBiZWdpbm5pbmdcbiAgICB0YXJnZXRDbGFzc1tzdGF0aWNNZXRob2RdKC4uLmFyZ3MpXG4gICAgcmV0dXJuIHRhcmdldENsYXNzXG4gIH1cbn1cblxuLy8gQ2xhc3MgZGVjb3JhdG9yIHRoYXQgd3JhcHMgYW5vdGhlciBjbGFzcyBkZWNvcmF0b3IgLSBBcHBseSBkZWNvcmF0b3IgY29uZGl0aW9uYWx5XG5leHBvcnQgZnVuY3Rpb24gY29uZGl0aW9uYWwoeyBjb25kaXRpb24gPSB0cnVlLCBkZWNvcmF0b3IgfSkge1xuICByZXR1cm4gY29uZGl0aW9uXG4gICAgPyBkZWNvcmF0b3JcbiAgICA6IENsYXNzID0+IHtcbiAgICAgICAgcmV0dXJuIENsYXNzXG4gICAgICB9XG59XG5cbi8qKlxuICogTWV0aG9kIGRlY29yYXRvciB0byBleGVjdXRlIG1ldGhvZCBvbmx5IG9uY2Ugb24gaW5zdGFuY2UuIGNhY2hpbmcgdGhlIHJlc3VsdCBvZiB0aGUgZmlyc3QgZXhlY3V0aW9uIHRvIHJldHVybiBpdCBvbiBzdWJzZXF1ZW50IGNhbGxzLlxuICogVHJhY2tzIGV4ZWN1dGlvbiB1c2luZyAnZXhlY3V0ZWRtZXRob2QnIG9iamVjdCwgd2hpY2ggaXQgYWRkcyB0byB0aGlzIGFyZ3VtZW50LlxuICovXG5leHBvcnQgZnVuY3Rpb24gZXhlY3V0ZU9uY2VGb3JFYWNoSW5zdGFuY2UoKSB7XG4gIC8vIGRlY29yYXRvciArIHByb3h5XG4gIHJldHVybiAodGFyZ2V0LCBtZXRob2ROYW1lLCBkZXNjcmlwdG9yKSA9PiB7XG4gICAgbGV0IG1ldGhvZCA9IHRhcmdldFttZXRob2ROYW1lXVxuICAgIGRlc2NyaXB0b3IudmFsdWUgPSBuZXcgUHJveHkobWV0aG9kLCB7XG4gICAgICBhcHBseTogYXN5bmMgKHRhcmdldCwgdGhpc0FyZyAvKiBzdXBwb3NlZGx5IHRoZSBjbGFzcyBjYWxsZXIqLywgYXJndW1lbnRzTGlzdCkgPT4ge1xuICAgICAgICBpZiAodGhpc0FyZy5leGVjdXRlZG1ldGhvZCAmJiB0aGlzQXJnLmV4ZWN1dGVkbWV0aG9kW21ldGhvZE5hbWVdICYmIHRoaXNBcmcuZXhlY3V0ZWRtZXRob2RbbWV0aG9kTmFtZV1bJ2V4ZWN1dGVkJ10pIHtcbiAgICAgICAgICByZXR1cm4gdGhpc0FyZy5leGVjdXRlZG1ldGhvZFttZXRob2ROYW1lXVsncmVzdWx0J11cbiAgICAgICAgfVxuICAgICAgICB0aGlzQXJnLmV4ZWN1dGVkbWV0aG9kID0ge31cbiAgICAgICAgdGhpc0FyZy5leGVjdXRlZG1ldGhvZFttZXRob2ROYW1lXSA9IHt9XG4gICAgICAgIGxldCBpbnN0YW5jZSA9IGF3YWl0IHRhcmdldC5hcHBseSh0aGlzQXJnLCBhcmd1bWVudHNMaXN0KVxuICAgICAgICB0aGlzQXJnLmV4ZWN1dGVkbWV0aG9kW21ldGhvZE5hbWVdWydleGVjdXRlZCddID0gdHJ1ZVxuICAgICAgICB0aGlzQXJnLmV4ZWN1dGVkbWV0aG9kW21ldGhvZE5hbWVdWydyZXN1bHQnXSA9IGluc3RhbmNlXG4gICAgICAgIHJldHVybiBpbnN0YW5jZVxuICAgICAgfSxcbiAgICB9KVxuICAgIHJldHVybiBkZXNjcmlwdG9yXG4gIH1cbn1cbiJdfQ==

@@ -1,48 +1,48 @@
-import EventEmitter from 'promise-events' // executes listeners with promise.all, allowing for await on event emittion.
+"use strict";var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");Object.defineProperty(exports, "__esModule", { value: true });exports.extendedSubclassPattern = void 0;var _promiseEvents = _interopRequireDefault(require("promise-events"));
 
-/**
- * Extended Subclass Pattern saves a reference of subclasses in superclass using a key-reference object.
- * This allows calling subclasses from superclass controllers.
- */
+
+
+
+
 function Superclass() {
   return Class => {
-    // eventEmitter
-    Class.eventEmitter = new EventEmitter().setMaxListeners(200) // increase maximum eventliseners (default = 10) // i.e. new EventEmitter()
 
-    // add static list for subclasses references
-    Class.extendedSubclass = { static: {} }
+    Class.eventEmitter = new _promiseEvents.default().setMaxListeners(200);
 
-    // Function to be called from subclasses to invoke superclass and add them to the list.
-    Class.addSubclass = function({ keyName, Subclass = this } = {}) {
-      if (!keyName) keyName = Subclass.name
+
+    Class.extendedSubclass = { static: {} };
+
+
+    Class.addSubclass = function ({ keyName, Subclass = this } = {}) {
+      if (!keyName) keyName = Subclass.name;
       Class.eventEmitter.on('addSubclass', () => {
-        Class.extendedSubclass.static[keyName] = Subclass
-      })
-    }
+        Class.extendedSubclass.static[keyName] = Subclass;
+      });
+    };
 
-    // create instance from subclass
+
     Class.callSubclass = (name, args) => {
-      return Reflect.construct(Class.extendedSubclass.static[name], args)
-    }
+      return Reflect.construct(Class.extendedSubclass.static[name], args);
+    };
 
-    // return the subclass object related to this class object.
-    Class.getSubclass = function({ subclassName }) {
-      return Class.extendedSubclass.static[subclassName]
-    }
 
-    return Class
-  }
+    Class.getSubclass = function ({ subclassName }) {
+      return Class.extendedSubclass.static[subclassName];
+    };
+
+    return Class;
+  };
 }
 
 function Subclass() {
   return Class => {
-    let Super = Object.getPrototypeOf(Class.prototype).constructor
-    Super.addSubclass.call(Class)
-    return Class
-  }
+    let Super = Object.getPrototypeOf(Class.prototype).constructor;
+    Super.addSubclass.call(Class);
+    return Class;
+  };
 }
 
-export let extendedSubclassPattern = {
+let extendedSubclassPattern = {
   Superclass,
-  Subclass,
-}
+  Subclass };exports.extendedSubclassPattern = extendedSubclassPattern;
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uLy4uL3NvdXJjZS9leHRlbmRlZFN1YmNsYXNzUGF0dGVybi5qcyJdLCJuYW1lcyI6WyJTdXBlcmNsYXNzIiwiQ2xhc3MiLCJldmVudEVtaXR0ZXIiLCJFdmVudEVtaXR0ZXIiLCJzZXRNYXhMaXN0ZW5lcnMiLCJleHRlbmRlZFN1YmNsYXNzIiwic3RhdGljIiwiYWRkU3ViY2xhc3MiLCJrZXlOYW1lIiwiU3ViY2xhc3MiLCJuYW1lIiwib24iLCJjYWxsU3ViY2xhc3MiLCJhcmdzIiwiUmVmbGVjdCIsImNvbnN0cnVjdCIsImdldFN1YmNsYXNzIiwic3ViY2xhc3NOYW1lIiwiU3VwZXIiLCJPYmplY3QiLCJnZXRQcm90b3R5cGVPZiIsInByb3RvdHlwZSIsImNvbnN0cnVjdG9yIiwiY2FsbCIsImV4dGVuZGVkU3ViY2xhc3NQYXR0ZXJuIl0sIm1hcHBpbmdzIjoieU1BQUE7Ozs7OztBQU1BLFNBQVNBLFVBQVQsR0FBc0I7QUFDcEIsU0FBT0MsS0FBSyxJQUFJOztBQUVkQSxJQUFBQSxLQUFLLENBQUNDLFlBQU4sR0FBcUIsSUFBSUMsc0JBQUosR0FBbUJDLGVBQW5CLENBQW1DLEdBQW5DLENBQXJCOzs7QUFHQUgsSUFBQUEsS0FBSyxDQUFDSSxnQkFBTixHQUF5QixFQUFFQyxNQUFNLEVBQUUsRUFBVixFQUF6Qjs7O0FBR0FMLElBQUFBLEtBQUssQ0FBQ00sV0FBTixHQUFvQixVQUFTLEVBQUVDLE9BQUYsRUFBV0MsUUFBUSxHQUFHLElBQXRCLEtBQStCLEVBQXhDLEVBQTRDO0FBQzlELFVBQUksQ0FBQ0QsT0FBTCxFQUFjQSxPQUFPLEdBQUdDLFFBQVEsQ0FBQ0MsSUFBbkI7QUFDZFQsTUFBQUEsS0FBSyxDQUFDQyxZQUFOLENBQW1CUyxFQUFuQixDQUFzQixhQUF0QixFQUFxQyxNQUFNO0FBQ3pDVixRQUFBQSxLQUFLLENBQUNJLGdCQUFOLENBQXVCQyxNQUF2QixDQUE4QkUsT0FBOUIsSUFBeUNDLFFBQXpDO0FBQ0QsT0FGRDtBQUdELEtBTEQ7OztBQVFBUixJQUFBQSxLQUFLLENBQUNXLFlBQU4sR0FBcUIsQ0FBQ0YsSUFBRCxFQUFPRyxJQUFQLEtBQWdCO0FBQ25DLGFBQU9DLE9BQU8sQ0FBQ0MsU0FBUixDQUFrQmQsS0FBSyxDQUFDSSxnQkFBTixDQUF1QkMsTUFBdkIsQ0FBOEJJLElBQTlCLENBQWxCLEVBQXVERyxJQUF2RCxDQUFQO0FBQ0QsS0FGRDs7O0FBS0FaLElBQUFBLEtBQUssQ0FBQ2UsV0FBTixHQUFvQixVQUFTLEVBQUVDLFlBQUYsRUFBVCxFQUEyQjtBQUM3QyxhQUFPaEIsS0FBSyxDQUFDSSxnQkFBTixDQUF1QkMsTUFBdkIsQ0FBOEJXLFlBQTlCLENBQVA7QUFDRCxLQUZEOztBQUlBLFdBQU9oQixLQUFQO0FBQ0QsR0ExQkQ7QUEyQkQ7O0FBRUQsU0FBU1EsUUFBVCxHQUFvQjtBQUNsQixTQUFPUixLQUFLLElBQUk7QUFDZCxRQUFJaUIsS0FBSyxHQUFHQyxNQUFNLENBQUNDLGNBQVAsQ0FBc0JuQixLQUFLLENBQUNvQixTQUE1QixFQUF1Q0MsV0FBbkQ7QUFDQUosSUFBQUEsS0FBSyxDQUFDWCxXQUFOLENBQWtCZ0IsSUFBbEIsQ0FBdUJ0QixLQUF2QjtBQUNBLFdBQU9BLEtBQVA7QUFDRCxHQUpEO0FBS0Q7O0FBRU0sSUFBSXVCLHVCQUF1QixHQUFHO0FBQ25DeEIsRUFBQUEsVUFEbUM7QUFFbkNTLEVBQUFBLFFBRm1DLEVBQTlCLEMiLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgRXZlbnRFbWl0dGVyIGZyb20gJ3Byb21pc2UtZXZlbnRzJyAvLyBleGVjdXRlcyBsaXN0ZW5lcnMgd2l0aCBwcm9taXNlLmFsbCwgYWxsb3dpbmcgZm9yIGF3YWl0IG9uIGV2ZW50IGVtaXR0aW9uLlxyXG5cclxuLyoqXHJcbiAqIEV4dGVuZGVkIFN1YmNsYXNzIFBhdHRlcm4gc2F2ZXMgYSByZWZlcmVuY2Ugb2Ygc3ViY2xhc3NlcyBpbiBzdXBlcmNsYXNzIHVzaW5nIGEga2V5LXJlZmVyZW5jZSBvYmplY3QuXHJcbiAqIFRoaXMgYWxsb3dzIGNhbGxpbmcgc3ViY2xhc3NlcyBmcm9tIHN1cGVyY2xhc3MgY29udHJvbGxlcnMuXHJcbiAqL1xyXG5mdW5jdGlvbiBTdXBlcmNsYXNzKCkge1xyXG4gIHJldHVybiBDbGFzcyA9PiB7XHJcbiAgICAvLyBldmVudEVtaXR0ZXJcclxuICAgIENsYXNzLmV2ZW50RW1pdHRlciA9IG5ldyBFdmVudEVtaXR0ZXIoKS5zZXRNYXhMaXN0ZW5lcnMoMjAwKSAvLyBpbmNyZWFzZSBtYXhpbXVtIGV2ZW50bGlzZW5lcnMgKGRlZmF1bHQgPSAxMCkgLy8gaS5lLiBuZXcgRXZlbnRFbWl0dGVyKClcclxuXHJcbiAgICAvLyBhZGQgc3RhdGljIGxpc3QgZm9yIHN1YmNsYXNzZXMgcmVmZXJlbmNlc1xyXG4gICAgQ2xhc3MuZXh0ZW5kZWRTdWJjbGFzcyA9IHsgc3RhdGljOiB7fSB9XHJcblxyXG4gICAgLy8gRnVuY3Rpb24gdG8gYmUgY2FsbGVkIGZyb20gc3ViY2xhc3NlcyB0byBpbnZva2Ugc3VwZXJjbGFzcyBhbmQgYWRkIHRoZW0gdG8gdGhlIGxpc3QuXHJcbiAgICBDbGFzcy5hZGRTdWJjbGFzcyA9IGZ1bmN0aW9uKHsga2V5TmFtZSwgU3ViY2xhc3MgPSB0aGlzIH0gPSB7fSkge1xyXG4gICAgICBpZiAoIWtleU5hbWUpIGtleU5hbWUgPSBTdWJjbGFzcy5uYW1lXHJcbiAgICAgIENsYXNzLmV2ZW50RW1pdHRlci5vbignYWRkU3ViY2xhc3MnLCAoKSA9PiB7XHJcbiAgICAgICAgQ2xhc3MuZXh0ZW5kZWRTdWJjbGFzcy5zdGF0aWNba2V5TmFtZV0gPSBTdWJjbGFzc1xyXG4gICAgICB9KVxyXG4gICAgfVxyXG5cclxuICAgIC8vIGNyZWF0ZSBpbnN0YW5jZSBmcm9tIHN1YmNsYXNzXHJcbiAgICBDbGFzcy5jYWxsU3ViY2xhc3MgPSAobmFtZSwgYXJncykgPT4ge1xyXG4gICAgICByZXR1cm4gUmVmbGVjdC5jb25zdHJ1Y3QoQ2xhc3MuZXh0ZW5kZWRTdWJjbGFzcy5zdGF0aWNbbmFtZV0sIGFyZ3MpXHJcbiAgICB9XHJcblxyXG4gICAgLy8gcmV0dXJuIHRoZSBzdWJjbGFzcyBvYmplY3QgcmVsYXRlZCB0byB0aGlzIGNsYXNzIG9iamVjdC5cclxuICAgIENsYXNzLmdldFN1YmNsYXNzID0gZnVuY3Rpb24oeyBzdWJjbGFzc05hbWUgfSkge1xyXG4gICAgICByZXR1cm4gQ2xhc3MuZXh0ZW5kZWRTdWJjbGFzcy5zdGF0aWNbc3ViY2xhc3NOYW1lXVxyXG4gICAgfVxyXG5cclxuICAgIHJldHVybiBDbGFzc1xyXG4gIH1cclxufVxyXG5cclxuZnVuY3Rpb24gU3ViY2xhc3MoKSB7XHJcbiAgcmV0dXJuIENsYXNzID0+IHtcclxuICAgIGxldCBTdXBlciA9IE9iamVjdC5nZXRQcm90b3R5cGVPZihDbGFzcy5wcm90b3R5cGUpLmNvbnN0cnVjdG9yXHJcbiAgICBTdXBlci5hZGRTdWJjbGFzcy5jYWxsKENsYXNzKVxyXG4gICAgcmV0dXJuIENsYXNzXHJcbiAgfVxyXG59XHJcblxyXG5leHBvcnQgbGV0IGV4dGVuZGVkU3ViY2xhc3NQYXR0ZXJuID0ge1xyXG4gIFN1cGVyY2xhc3MsXHJcbiAgU3ViY2xhc3MsXHJcbn1cclxuIl19
